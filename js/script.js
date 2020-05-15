@@ -40,6 +40,7 @@ const paginationButtons = document.querySelector(".pagination-list");
 //  EVENT LISTENERS
 //================================
 
+
 paginationButtons.addEventListener('click', e => {
    const currentActiveButton = paginationButtons.querySelector(".active");
    const buttonPressed = e.target;
@@ -55,13 +56,14 @@ paginationButtons.addEventListener('click', e => {
 //  FUNCTIONS
 //================================
 
+// creates pagination buttons
 function createPages() {
-   numberOfPages = 0;
-   let studentDisplayCount = studentDisplayList.length;
-   let pagesNeeded = Math.ceil( studentDisplayCount/resultsPerPage );
-   let pageNumber = 0;
+   numberOfPages = 0; // keeps track of number of pages that need to be created
+   let studentDisplayCount = studentDisplayList.length; //number of students that will display in results
+   let pagesNeeded = Math.ceil( studentDisplayCount/resultsPerPage ); //
+   let pageNumber = 0; //used to create each pagination button li 
 
-   paginationButtons.innerHTML = "";
+   paginationButtons.innerHTML = ""; // clears li elements from parent ul container
 
    // creates pagination buttons
    for (let i = 0; i < pagesNeeded; i++) {
@@ -75,7 +77,7 @@ function createPages() {
    firstPageButton.classList += "active";
 }
 
-
+// applies a display "none" style to all students in the DOM
 function hideAllStudents() {
    let students = document.querySelectorAll(".student-item");
    students.forEach(student => {
@@ -83,35 +85,38 @@ function hideAllStudents() {
    });   
 }
 
-
+// display page results based on current page selected
 const pageResults = function(){
    let pageSelected = document.querySelector(".active");
-   let lastPageStudentCount = studentDisplayList.length % resultsPerPage;
-   let lastPageIsActive = pageSelected.textContent == numberOfPages;
-   let firstStudentIndex = (pageSelected.textContent * resultsPerPage) - resultsPerPage;
+   let lastPageStudentCount = studentDisplayList.length % resultsPerPage; //number of students displayed in last page
+   let lastPageIsActive = pageSelected.textContent == numberOfPages; //checks if user has selected last page
+   let firstStudentIndex = (pageSelected.textContent * resultsPerPage) - resultsPerPage; 
    let lastStudentIndex = firstStudentIndex + 9;
 
    hideAllStudents()    
    
-   if (lastPageIsActive) {
+   // update last student index value on last page. To prevent console errors
+   if (lastPageIsActive) { 
       lastStudentIndex = (firstStudentIndex + lastPageStudentCount) - 1;
    }
    
    // displays corresponding page results
    for (let i = firstStudentIndex; i <= lastStudentIndex; i++) {
-      let studentToDisplayIndex = studentDisplayList[i].index;
-      let studentCardsContainer = document.querySelectorAll(".student-item");
-      studentCardsContainer[studentToDisplayIndex].style.display = "block";
+      let studentToDisplayIndex = studentDisplayList[i].index; //index value of student to be displayed
+      let studentCardsContainer = document.querySelectorAll(".student-item"); //selects all student cards in the DOM
+      studentCardsContainer[studentToDisplayIndex].style.display = "block"; // display student card based on their index value
    }  
 }
 
+// first when user uses search feature
 function filterResults() {
-   let search = document.querySelector(".searchbar").value.toLowerCase();
+   let userSearchInput = document.querySelector(".searchbar").value.toLowerCase(); 
    const noResultsMessage = document.querySelector(".js-no-results-message");
    hideAllStudents()
 
-   studentDisplayList = studentList.filter(student => student.name.includes(search));
-   if (studentDisplayList == 0) {
+   //creates a list of students that will be displayed if the meet filter requirements
+   studentDisplayList = studentList.filter(student => student.name.includes(userSearchInput));
+   if (studentDisplayList == 0) { //no result message will appear if there are no students to display
       noResultsMessage.style.display = "block";
       paginationButtons.innerHTML = "";
    } else {
