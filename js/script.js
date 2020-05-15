@@ -1,50 +1,130 @@
-/******************************************
-Treehouse Techdegree:
-FSJS project 2 - List Filter and Pagination
-******************************************/
+const page = document.querySelector(".page");
+const studentCards = document.querySelectorAll(".student-item");
+const resultsPerPage = 10;
+const pageHeader = document.querySelector(".page-header");
+let studentList = [];
+let numberOfPages = 0;
+
+
+
+// creates array of objects, each object stores student name and their index value in the dom.
+// Index value will be used to locate a student card in the DOM.
+let studentIndex = 0;
+studentCards.forEach(student => {
+   let studentName = student.querySelector('H3').innerText;
+   let studentObject = {name: studentName, index: studentIndex};
+   studentList.push(studentObject);
+   studentIndex ++;
+});
+// initially all students will display in DOM.
+let studentDisplayList = studentList;
+
+
+//================================
+//  ELEMENTS ADDED TO DOM
+//================================
+// searchbar
+pageHeader.innerHTML += `<div class="student-search">
+                           <input class="searchbar" onkeyup="filterResults()" type="text" placeholder="Enter student name...">
+                           <button class="searchbar-btn" onclick="filterResults()" type="button">Search</button>
+                        </div>`
+
+//no search results message
+page.innerHTML += "<h3 class='js-no-results-message' style='font-size: 2em; text-align: center; display: none; color: #b3b3b3; margin-top: 1em;'>🐜Sorry no results</h3>";
+
+// page nav buttons container
+page.innerHTML += '<div class="pagination"><ul class="pagination-list"></ul></div>';
+const paginationButtons = document.querySelector(".pagination-list");
+
+//================================
+//  EVENT LISTENERS
+//================================
+
+paginationButtons.addEventListener('click', e => {
+   const currentActiveButton = paginationButtons.querySelector(".active");
+   const buttonPressed = e.target;
+
+   currentActiveButton.classList = "";
+   buttonPressed.classList = "active";
+
+   pageResults()
+});
    
-// Study guide for this project - https://drive.google.com/file/d/1OD1diUsTMdpfMDv677TfL1xO2CEkykSz/view?usp=sharing
+
+//================================
+//  FUNCTIONS
+//================================
+
+function createPages() {
+   numberOfPages = 0;
+   let studentDisplayCount = studentDisplayList.length;
+   let pagesNeeded = Math.ceil( studentDisplayCount/resultsPerPage );
+   let pageNumber = 0;
+
+   paginationButtons.innerHTML = "";
+
+   // creates pagination buttons
+   for (let i = 0; i < pagesNeeded; i++) {
+      pageNumber = i + 1;
+      numberOfPages += 1;
+      paginationButtons.innerHTML += `<li><a href="#">${pageNumber}</a></li>`
+   }
+
+   // adds an "active" class to to the first page button
+   let firstPageButton = paginationButtons.childNodes[0].firstChild;
+   firstPageButton.classList += "active";
+}
 
 
-/*** 
-   Add your global variables that store the DOM elements you will 
-   need to reference and/or manipulate. 
+function hideAllStudents() {
+   let students = document.querySelectorAll(".student-item");
+   students.forEach(student => {
+      student.style.display = "none";
+   });   
+}
+
+
+const pageResults = function(){
+   let pageSelected = document.querySelector(".active");
+   let lastPageStudentCount = studentDisplayList.length % resultsPerPage;
+   let lastPageIsActive = pageSelected.textContent == numberOfPages;
+   let firstStudentIndex = (pageSelected.textContent * resultsPerPage) - resultsPerPage;
+   let lastStudentIndex = firstStudentIndex + 9;
+
+   hideAllStudents()    
    
-   But be mindful of which variables should be global and which 
-   should be locally scoped to one of the two main functions you're 
-   going to create. A good general rule of thumb is if the variable 
-   will only be used inside of a function, then it can be locally 
-   scoped to that function.
-***/
+   if (lastPageIsActive) {
+      lastStudentIndex = (firstStudentIndex + lastPageStudentCount) - 1;
+   }
+   
+   // displays corresponding page results
+   for (let i = firstStudentIndex; i <= lastStudentIndex; i++) {
+      let studentToDisplayIndex = studentDisplayList[i].index;
+      let studentCardsContainer = document.querySelectorAll(".student-item");
+      studentCardsContainer[studentToDisplayIndex].style.display = "block";
+   }  
+}
 
+function filterResults() {
+   let search = document.querySelector(".searchbar").value.toLowerCase();
+   const noResultsMessage = document.querySelector(".js-no-results-message");
+   hideAllStudents()
 
+   studentDisplayList = studentList.filter(student => student.name.includes(search));
+   if (studentDisplayList == 0) {
+      noResultsMessage.style.display = "block";
+      paginationButtons.innerHTML = "";
+   } else {
+      createPages();
+      pageResults();
+      noResultsMessage.style.display = "none";
+   }
+}
 
+//================================
+//  RUN FUNCTIONS AT START
+//================================
+createPages();
+hideAllStudents() 
+pageResults()
 
-/*** 
-   Create the `showPage` function to hide all of the items in the 
-   list except for the ten you want to show.
-
-   Pro Tips: 
-     - Keep in mind that with a list of 54 students, the last page 
-       will only display four.
-     - Remember that the first student has an index of 0.
-     - Remember that a function `parameter` goes in the parens when 
-       you initially define the function, and it acts as a variable 
-       or a placeholder to represent the actual function `argument` 
-       that will be passed into the parens later when you call or 
-       "invoke" the function 
-***/
-
-
-
-
-/*** 
-   Create the `appendPageLinks function` to generate, append, and add 
-   functionality to the pagination buttons.
-***/
-
-
-
-
-
-// Remember to delete the comments that came with this file, and replace them with your own code comments.
